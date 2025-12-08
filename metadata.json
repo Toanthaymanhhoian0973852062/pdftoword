@@ -1,0 +1,5 @@
+{
+  "name": "DocuLatex Converter",
+  "description": "Convert PDFs and Images into editable Markdown with LaTeX math support using Gemini 2.5 Flash.",
+  "requestFramePermissions": []
+}
