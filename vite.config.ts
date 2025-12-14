@@ -5,8 +5,8 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
-      // Quan trọng: base './' giúp Electron tìm thấy file css/js khi load file://
-      base: mode === 'production' ? './' : '/',
+      // Sử dụng '/' cho môi trường Web (Vercel), './' chỉ dùng cho Electron hoặc file system local
+      base: '/',
       server: {
         port: 3000,
         host: '0.0.0.0',
