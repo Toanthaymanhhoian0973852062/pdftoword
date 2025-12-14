@@ -22,7 +22,17 @@ import {
   Lock,
   History,
   User,
-  Mail
+  Mail,
+  ZoomIn,
+  ZoomOut,
+  PanelLeft,
+  Facebook,
+  Heart,
+  Key,
+  Crown,
+  ShieldCheck,
+  Unlock,
+  Phone
 } from 'lucide-react';
 
 export const Icons = {
@@ -48,5 +58,15 @@ export const Icons = {
   Lock,
   History,
   User,
-  Mail
+  Mail,
+  ZoomIn,
+  ZoomOut,
+  PanelLeft,
+  Facebook,
+  Heart,
+  Key,
+  Crown,
+  ShieldCheck,
+  Unlock,
+  Phone
 };

@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Icons } from './Icon';
 
+// Use static path for logo assuming it is served from root
+const logoUrl = "/logo.png";
+
 export const AuthPage: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -49,18 +52,33 @@ export const AuthPage: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA] relative overflow-hidden font-sans">
       {/* Background Effects */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-200/30 blur-[100px] animate-blob" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-200/30 blur-[100px] animate-blob animation-delay-2000" />
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-200/30 blur-[100px] animate-blob" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-200/30 blur-[100px] animate-blob animation-delay-2000" />
       
       <div className="w-full max-w-md p-8 z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <div className="bg-white/80 backdrop-blur-xl border border-white/60 shadow-2xl shadow-indigo-500/10 rounded-[2.5rem] p-8 sm:p-10 relative overflow-hidden">
+        <div className="bg-white/80 backdrop-blur-xl border border-white/60 shadow-2xl shadow-blue-500/10 rounded-[2.5rem] p-8 sm:p-10 relative overflow-hidden">
           
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl shadow-lg shadow-indigo-500/30 mb-6 transform rotate-3">
-              <Icons.FileText className="w-8 h-8 text-white" />
+            {/* BRAND LOGO IMAGE - Using logo.png */}
+            <div className="relative inline-block mb-6">
+                <div className="absolute inset-0 bg-blue-600 rounded-full blur opacity-20 transform scale-110"></div>
+                <img 
+                    src={logoUrl} 
+                    alt="Logo" 
+                    className="relative w-24 h-24 rounded-full object-cover border-4 border-white shadow-2xl shadow-blue-900/20 transform hover:scale-105 transition-all duration-500"
+                    onError={(e) => {
+                        // Fallback
+                        e.currentTarget.style.display = 'none';
+                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                    }}
+                />
+                <div className="hidden w-24 h-24 bg-[#003580] rounded-2xl shadow-lg shadow-blue-900/30 flex items-center justify-center transform rotate-3">
+                    <Icons.FileText className="w-12 h-12 text-white" />
+                </div>
             </div>
-            <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">DocuLatex</h1>
+
+            <h1 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">Toán Thầy Mạnh - Hội An</h1>
             <p className="text-slate-500">Chuyển đổi tài liệu thông minh</p>
           </div>
 
@@ -87,24 +105,24 @@ export const AuthPage: React.FC = () => {
                       required={!isLogin}
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none text-slate-800 placeholder-slate-400"
+                      className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-800 placeholder-slate-400"
                       placeholder="Nguyễn Văn A"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-sm font-semibold text-indigo-700 ml-1">Mã kích hoạt</label>
+                  <label className="text-sm font-semibold text-blue-700 ml-1">Mã kích hoạt</label>
                   <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Icons.Lock className="h-5 w-5 text-indigo-500" />
+                      <Icons.Lock className="h-5 w-5 text-blue-500" />
                     </div>
                     <input
                       type="text"
                       required={!isLogin}
                       value={accessCode}
                       onChange={(e) => setAccessCode(e.target.value)}
-                      className="block w-full pl-11 pr-4 py-3 bg-indigo-50/50 border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all outline-none text-indigo-900 placeholder-indigo-300 font-bold tracking-wide"
+                      className="block w-full pl-11 pr-4 py-3 bg-blue-50/50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all outline-none text-blue-900 placeholder-blue-300 font-bold tracking-wide"
                       placeholder="Nhập mã do Admin cung cấp"
                     />
                   </div>
@@ -124,7 +142,7 @@ export const AuthPage: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none text-slate-800 placeholder-slate-400"
+                  className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-800 placeholder-slate-400"
                   placeholder="email@example.com"
                 />
               </div>
@@ -141,7 +159,7 @@ export const AuthPage: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none text-slate-800 placeholder-slate-400"
+                  className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none text-slate-800 placeholder-slate-400"
                   placeholder="********"
                 />
               </div>
@@ -150,7 +168,7 @@ export const AuthPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed mt-6"
+              className="w-full py-3.5 px-4 bg-gradient-to-r from-[#003580] to-blue-600 hover:from-blue-800 hover:to-blue-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed mt-6"
             >
               {loading ? (
                 <div className="flex items-center justify-center space-x-2">
@@ -172,7 +190,7 @@ export const AuthPage: React.FC = () => {
                   setIsLogin(!isLogin);
                   setError("");
                 }}
-                className="ml-2 font-bold text-indigo-600 hover:text-indigo-700 hover:underline focus:outline-none transition-colors"
+                className="ml-2 font-bold text-blue-700 hover:text-blue-800 hover:underline focus:outline-none transition-colors"
               >
                 {isLogin ? "Đăng ký ngay" : "Đăng nhập ngay"}
               </button>

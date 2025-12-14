@@ -4,9 +4,10 @@ import { Icons } from './Icon';
 interface ImageCropperProps {
   imageUrl: string;
   onCropConfirm: (base64: string) => void;
+  className?: string;
 }
 
-export const ImageCropper: React.FC<ImageCropperProps> = ({ imageUrl, onCropConfirm }) => {
+export const ImageCropper: React.FC<ImageCropperProps> = ({ imageUrl, onCropConfirm, className }) => {
   const [isSelecting, setIsSelecting] = useState(false);
   const [selection, setSelection] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   const [startPos, setStartPos] = useState<{ x: number; y: number } | null>(null);
@@ -57,60 +58,42 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({ imageUrl, onCropConf
     setIsSelecting(false);
   };
 
-  // Execute Crop
   const handleCrop = () => {
-    if (!selection || !imgRef.current || selection.w < 5 || selection.h < 5) {
-        alert("Vui lòng quét chọn vùng ảnh cần cắt trước.");
-        return;
-    }
-
-    const img = imgRef.current;
-    
-    // Calculate ratio between displayed size and natural size
-    const scaleX = img.naturalWidth / img.width;
-    const scaleY = img.naturalHeight / img.height;
+    if (!selection || !imgRef.current) return;
 
     const canvas = document.createElement('canvas');
-    canvas.width = selection.w * scaleX;
-    canvas.height = selection.h * scaleY;
+    canvas.width = selection.w;
+    canvas.height = selection.h;
     const ctx = canvas.getContext('2d');
 
     if (ctx) {
+      // Calculate the ratio between natural image size and displayed size
+      const scaleX = imgRef.current.naturalWidth / imgRef.current.width;
+      const scaleY = imgRef.current.naturalHeight / imgRef.current.height;
+
       ctx.drawImage(
-        img,
+        imgRef.current,
         selection.x * scaleX,
         selection.y * scaleY,
         selection.w * scaleX,
         selection.h * scaleY,
         0,
         0,
-        canvas.width,
-        canvas.height
+        selection.w,
+        selection.h
       );
-      
+
       const base64 = canvas.toDataURL('image/png').split(',')[1];
       onCropConfirm(base64);
-      setSelection(null); // Reset selection after crop
+      setSelection(null);
     }
   };
 
   return (
-    <div className="flex flex-col h-full relative">
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex space-x-2 bg-white/90 backdrop-blur shadow-lg px-4 py-2 rounded-full border border-slate-200 pointer-events-none">
-         <span className="text-xs font-semibold text-slate-600 flex items-center">
-            <Icons.MousePointer className="w-4 h-4 mr-2 text-brand-600" />
-            Quét chuột để chọn hình ảnh
-         </span>
-         {selection && selection.w > 10 && (
-            <span className="text-xs text-brand-600 font-bold ml-2 animate-pulse">
-               Thả chuột để hiện nút cắt
-            </span>
-         )}
-      </div>
-
+    <div className="relative inline-block">
       <div 
         ref={containerRef}
-        className="relative select-none cursor-crosshair overflow-hidden rounded-lg shadow-inner bg-slate-100 flex items-start justify-center"
+        className="relative cursor-crosshair select-none"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -119,15 +102,15 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({ imageUrl, onCropConf
         <img 
           ref={imgRef}
           src={imageUrl} 
-          alt="Source" 
-          className="max-w-full pointer-events-none select-none"
+          alt="Crop Source" 
+          className={`block ${className || 'max-w-full'} pointer-events-none`}
           draggable={false}
         />
         
         {/* Selection Overlay */}
-        {selection && (
+        {selection && (selection.w > 0 || selection.h > 0) && (
           <div 
-            className="absolute border-2 border-brand-500 bg-brand-500/20 shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]"
+            className="absolute border-2 border-indigo-500 bg-indigo-500/10 z-10"
             style={{
               left: selection.x,
               top: selection.y,
@@ -135,24 +118,17 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({ imageUrl, onCropConf
               height: selection.h
             }}
           >
-             {/* Handles for visual cue */}
-             <div className="absolute -top-1 -left-1 w-2 h-2 bg-brand-500 border border-white"></div>
-             <div className="absolute -top-1 -right-1 w-2 h-2 bg-brand-500 border border-white"></div>
-             <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-brand-500 border border-white"></div>
-             <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-brand-500 border border-white"></div>
-             
-             {/* Center Action (Alternative to top bar) */}
-             {!isSelecting && selection.w > 20 && (
-                 <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 z-50">
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); handleCrop(); }}
-                        className="bg-brand-600 text-white px-4 py-2 rounded-lg shadow-xl font-bold hover:bg-brand-700 flex items-center whitespace-nowrap ring-2 ring-white transform transition-all hover:scale-105"
-                    >
-                        <Icons.Scissors className="w-4 h-4 mr-2" />
-                        Cắt & Dán
-                    </button>
-                 </div>
-             )}
+             {/* Confirm Button attached to selection */}
+             <button
+               onClick={(e) => {
+                 e.stopPropagation(); // Prevent drag start
+                 handleCrop();
+               }}
+               className="absolute -bottom-10 right-0 bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg hover:bg-indigo-700 flex items-center gap-1"
+             >
+               <Icons.Scissors className="w-4 h-4" />
+               Cắt
+             </button>
           </div>
         )}
       </div>

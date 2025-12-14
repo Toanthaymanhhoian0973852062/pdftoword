@@ -17,6 +17,7 @@ export const PdfCropper: React.FC<PdfCropperProps> = ({ file, onCropConfirm }) =
   const [totalPages, setTotalPages] = useState(0);
   const [pageImage, setPageImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [scale, setScale] = useState(1.5); // Default zoom scale
 
   // Load PDF Document
   useEffect(() => {
@@ -46,7 +47,7 @@ export const PdfCropper: React.FC<PdfCropperProps> = ({ file, onCropConfirm }) =
       try {
         setLoading(true);
         const page = await pdfDoc.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 2.0 }); // High scale for better crop quality
+        const viewport = page.getViewport({ scale }); 
         
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
@@ -65,13 +66,20 @@ export const PdfCropper: React.FC<PdfCropperProps> = ({ file, onCropConfirm }) =
     };
     
     renderPage();
-  }, [pdfDoc, pageNum]);
+  }, [pdfDoc, pageNum, scale]);
 
   const changePage = (delta: number) => {
     const newPage = pageNum + delta;
     if (newPage >= 1 && newPage <= totalPages) {
       setPageNum(newPage);
     }
+  };
+
+  const handleZoom = (delta: number) => {
+      setScale(prev => {
+          const newScale = prev + delta;
+          return Math.max(0.5, Math.min(newScale, 4.0)); // Limit scale between 0.5x and 4.0x
+      });
   };
 
   if (loading && !pageImage) {
@@ -89,34 +97,60 @@ export const PdfCropper: React.FC<PdfCropperProps> = ({ file, onCropConfirm }) =
       <div className="flex-1 overflow-auto p-8 flex justify-center bg-slate-100/50 scroll-smooth custom-scrollbar">
         {pageImage && (
           <div className="bg-white shadow-2xl shadow-slate-300/50 rounded-xl overflow-hidden border border-slate-200">
-             <ImageCropper imageUrl={pageImage} onCropConfirm={onCropConfirm} />
+             <ImageCropper 
+                imageUrl={pageImage} 
+                onCropConfirm={onCropConfirm} 
+                className="max-w-none" // Allow image to overflow container for zooming
+             />
           </div>
         )}
       </div>
 
-      {/* Floating Pagination Controls */}
+      {/* Floating Controls Bar */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
-         <div className="flex items-center space-x-4 bg-white/90 backdrop-blur-md px-2 py-2 rounded-full border border-slate-200 shadow-xl shadow-slate-300/40 transition-all hover:scale-105">
+         <div className="flex items-center space-x-2 bg-white/90 backdrop-blur-md px-3 py-2 rounded-full border border-slate-200 shadow-xl shadow-slate-300/40 transition-all hover:scale-105">
+            {/* Page Navigation */}
             <button
               onClick={() => changePage(-1)}
               disabled={pageNum <= 1}
-              className="p-2.5 rounded-full hover:bg-indigo-50 hover:text-indigo-600 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+              className="p-2 rounded-full hover:bg-indigo-50 hover:text-indigo-600 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
               title="Trang trước"
             >
               <Icons.ChevronLeft className="w-5 h-5" />
             </button>
             
-            <span className="font-bold text-slate-700 text-sm min-w-[80px] text-center font-mono">
-              {pageNum} / {totalPages}
+            <span className="font-bold text-slate-700 text-sm min-w-[70px] text-center font-mono select-none">
+              {pageNum}/{totalPages}
             </span>
 
             <button
               onClick={() => changePage(1)}
               disabled={pageNum >= totalPages}
-              className="p-2.5 rounded-full hover:bg-indigo-50 hover:text-indigo-600 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+              className="p-2 rounded-full hover:bg-indigo-50 hover:text-indigo-600 disabled:opacity-30 disabled:hover:bg-transparent transition-colors border-r border-slate-200 mr-2"
               title="Trang sau"
             >
               <Icons.ChevronRight className="w-5 h-5" />
+            </button>
+
+            {/* Zoom Controls */}
+            <button
+              onClick={() => handleZoom(-0.25)}
+              className="p-2 rounded-full hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+              title="Thu nhỏ"
+            >
+              <Icons.ZoomOut className="w-5 h-5" />
+            </button>
+            
+            <span className="font-bold text-slate-600 text-xs min-w-[40px] text-center select-none">
+                {Math.round(scale * 100)}%
+            </span>
+
+            <button
+              onClick={() => handleZoom(0.25)}
+              className="p-2 rounded-full hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+              title="Phóng to"
+            >
+              <Icons.ZoomIn className="w-5 h-5" />
             </button>
          </div>
       </div>

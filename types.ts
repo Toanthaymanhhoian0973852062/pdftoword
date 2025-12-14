@@ -18,6 +18,7 @@ export interface FileData {
   previewUrl: string; // Object URL for previewing images/pdfs
   base64: string;
   mimeType: string;
+  pages: string[]; // Array of base64 strings representing each page of the original document
 }
 
 export interface HistoryItem {
